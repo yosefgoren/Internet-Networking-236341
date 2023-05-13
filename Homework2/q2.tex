@@ -1,0 +1,45 @@
+\section{ICMP}
+\subsection{ICMP types and codes}
+\begin{enumerate}[label=\textbf{\alph*.}]
+    \item The router sends an ICMP Time Exceeded packet to
+    with \texttt{type=11} and \texttt{code=0} which means it is due to TTL running out.
+    \item The router sends an ICMP Destination Unreachable packet,
+    with \texttt{type=3} and \texttt{code=4} which means that fragmantation was required
+    but not allowed due to the DF flag.
+    \item The router sends an ICMP Destination Unreachable packet,
+    with \texttt{type=3} and \texttt{code=1} which means the destination network is unreachable.
+    \item The router sends an ICMP Destination Unreachable packet,
+    with \texttt{type=3} and \texttt{code=3} which means
+    the destination port is unreachable.
+    \item It will send a packet with \texttt{type=5} and \texttt{code=0}
+    which indicates that a packet was forwareded but the existing routing is used was not optimal in
+    the sense that it should have been routed through the same LAN.
+    \item The router will return an ICMP echo reply packet
+    which has \texttt{type=0}, \texttt{code=0}.
+    \item The router sends an ICMP Destination Unreachable packet,
+    with \texttt{type=3} and \texttt{code=0} which
+    means that the destination address could not be reached.
+\end{enumerate}
+\subsection{MTU discovery}
+MTU is the Maximum Transmission Unit,
+which is a number (in bytes) that describes the maximal size of a packet
+that will be sent.\\
+MTU discovery is a process where on a specific socket - the two communicating
+parties attempt to find the MTU for the links that connect them - so
+they can send packets with the optimal size in their communication.\\
+
+MTU discovery is done by attempting different message sizes (and \texttt{DF=1}) and seeing which
+are capable of passing and which do not return or result with an 'ICMP could not Fragment' - which
+means the packet was too large.
+A failiure indicates the packet size is larger than the MTU while 
+a success indicates the packet size is smaller or equal to the MTU.
+To accelerate this process a binary search algorithm can be used.
+
+\subsection{ICMP and IP}
+ICMP is the Internet Control Message Protocol while IP is Internet Protocol.\\
+The ICMP protocol enables the IP protocol to work, by transfering
+metadata about how IP messages are moving through the network (such as in the examples in the first
+part of the question).\\
+It is also somewhat circular as ICMP packets are built upon the IP headers,
+while the routers and hosts that transfer IP packets relay on the ICMP
+protocol to be configured properly.
