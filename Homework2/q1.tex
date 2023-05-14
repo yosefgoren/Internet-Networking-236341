@@ -45,7 +45,10 @@
 \subsection{\texttt{ipconfig} \& Wireshark}
 \begin{enumerate}[label=\textbf{\alph*.}]
     \setcounter{enumi}{2}
-    \item Multiple queries were sent. The queries and responses used the TCP protocol.
+    \item Multiple queries were sent. The queries and responses used both TCP and UDP under different circumstances;
+    when using Edge browser (as in the photos) - the protocol was TCP
+    \footnote{likely due to the fact DNS over HTTPS was used - which is built on TLS - which is built on TCP}
+    , and when using Firefox - UDP was used.
     \item There were in-fact 3 different DNS queries initiated and 3 responses regarding my search:
     \begin{center}
 		\includegraphics[width=1.2 \textwidth]{resources/dns1.png}\centering

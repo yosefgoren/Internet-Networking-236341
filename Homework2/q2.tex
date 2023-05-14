@@ -6,8 +6,8 @@
     \item The router sends an ICMP Destination Unreachable packet,
     with \texttt{type=3} and \texttt{code=4} which means that fragmantation was required
     but not allowed due to the DF flag.
-    \item The router sends an ICMP Destination Unreachable packet,
-    with \texttt{type=3} and \texttt{code=1} which means the destination network is unreachable.
+    \item The router sends an ICMP Source Quench packet,
+    with \texttt{type=4} and \texttt{code=0} which means the buffer was full.
     \item The router sends an ICMP Destination Unreachable packet,
     with \texttt{type=3} and \texttt{code=3} which means
     the destination port is unreachable.
