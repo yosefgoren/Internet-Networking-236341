@@ -1,1 +1,45 @@
 \section{BGP Business Relations}
+In this question we are assuming the export policy:
+\begin{enumerate}[label=\textbf{\Roman*.}]
+    \item If the route is via a customer - advretize to all neighbors.
+    \item Advresize all routes to all customers.
+    \item Otherwise - do not advretize.
+\end{enumerate}
+We are also assuming that the import policy is to accept all incoming routes.
+
+\subsection{\texttt{(6,3,4,7)}}
+The route is possible in terms of the export policy:\\
+AS4 sees the route $4\rightarrow 7$ and due to rule I - it advretizes
+it to AS3.\\
+AS3 sees possbile route $3\rightarrow 4\rightarrow 7$, and due to rule II,
+it advretize it to AS6.\\
+Hence AS6 has the route $6\rightarrow 3\rightarrow 4\rightarrow 7$,
+so it is possible in terms of the export policy.
+
+\subsection{\texttt{(6,3,4,5)}}
+The route is not possible, AS5 isn't a costumer 
+of AS4, so the route through AS4 to AS5 will not be exported 
+to AS3, and the route isn't possible.
+
+\subsection{\texttt{(6,7,5)}}
+This route is not possible.\\
+Since AS6 is not a customer of AS7 (rule II not satisfied), and AS5 is not a customer
+of AS7 (rule I not satisfied) - then AS7 will not advretize the route $7\rightarrow 5$
+to AS6, so it has not way of know that this route exists.
+
+\subsection{\texttt{(3,1,4)} - $\pi$}
+The route is possible.\\
+AS1 sees the route $1\rightarrow 4$,
+and since AS4 is it's customer (rule I), it will advretize this route to AS3 -
+hence AS3 knows about the route $3\rightarrow 1\rightarrow 4$.
+
+\subsection{\texttt{(2,4,5)}}
+This route is not possible.\\
+AS4 is not a provider for neither AS2 nor AS5 - hence
+it will not advretize the route $4\rightarrow 2$ to AS5.\\
+So AS5 will not know about this route.
+
+\subsection{\texttt{(4,7,5)}}
+This route is not possible.\\
+Since to AS7 - neither AS4 nor AS5 are customers, it will not advretize
+the route $7\rightarrow 4$ to AS5, and so AS5 does not know about the route $5\rightarrow 7\rightarrow 4$.
