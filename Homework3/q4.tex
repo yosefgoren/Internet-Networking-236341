@@ -63,7 +63,9 @@ It seems the path in the bgp table from texttt{R5} to texttt{R1} \texttt{0 4 7 6
 \end{center}
 
 \subsection{}
-The AS manager added the prefix \texttt{3 1} to 
+The AS1 manager added AS's \texttt{3 1} to the AS-PATH attribute of each route advretized by it, now the AS3 router
+that gets information about the path, sees the \texttt{1 3 1} and reject the 
+advertisement, because it wants to prevent loops.
 \begin{center}
     \includegraphics[width=1.2 \textwidth]{resources/q4-3.png}\centering
 \end{center}
@@ -72,4 +74,38 @@ The AS manager added the prefix \texttt{3 1} to
 \begin{center}
     \includegraphics[width=1.2 \textwidth]{resources/q4-4.png}\centering
 \end{center}
- we can see in the line 192.168.7.0 is directly connected, R4-
+we can also see the line "\texttt{192.168.7.0 is directly connected, R4-eth3}", at the end.
+which tells us that the packets to AS1 are transported through AS7.
+
+
+\subsection{}
+It appears that the BGP keepalive packets arrive at a frequency of one per minute (you can see the
+time intervals by looking at the time column in wireshark).
+\begin{center}
+    \includegraphics[width=1.2 \textwidth]{resources/q4-5.png}\centering
+\end{center}
+
+\subsection{}
+\texttt{R5} recived the \texttt{BGP Update} message from \texttt{R4}, and it conatins
+instructions to withdraw (cancel) a routing to the prefix \texttt{1.1.1.1} which is the one in AS1.
+\begin{center}
+    \includegraphics[width=1.2 \textwidth]{resources/q4-6.png}\centering
+\end{center}
+
+\begin{center}
+    \includegraphics[width=1.2 \textwidth]{resources/q4-7.png}\centering
+\end{center}
+
+\subsection{}
+We can see that \texttt{R4} does not know how to reach the prefix \texttt{1.1.1.1} by seeing that it has no
+routing entry that reaches \texttt{1.1.1.1}:
+\begin{center}
+    \includegraphics[width=1.2 \textwidth]{resources/q4-8.png}\centering
+\end{center}
+
+\subsection{}
+Now the \texttt{BGP Update} message contains instructions to add a new route to the prefix
+\texttt{1.1.1.1}:
+\begin{center}
+    \includegraphics[width=1.2 \textwidth]{resources/q4-9.png}\centering
+\end{center}
