@@ -7,7 +7,6 @@
 #include <csignal>
 #include <map>
 #include <memory>
-#include <optional>
 #include <vector>
 
 #include "../LBCore/LBCore.hpp"
@@ -18,6 +17,7 @@ public:
     static SocketManager& get(){
         if(gman == nullptr){
             gman = new SocketManager();
+            gman->min_free_socket_key = 0;
         }
         return *gman;
     }
@@ -34,8 +34,8 @@ public:
     static void deallocate(){
         if(gman != nullptr){
             auto sm = SocketManager::get();
-            for(auto& [socket_key, socket_num]: sm.open_sockets){
-                close(socket_num);
+            for(auto& socket_key_and_socket_num: sm.open_sockets){
+                close(socket_key_and_socket_num.second);
             }
             delete gman;
             gman = nullptr;
@@ -56,15 +56,12 @@ private:
     /**
      * @return a key which is unused in 'open_sockets':
     **/
-    static int find_free_socket_key(){
-        static std::optional<int> cnt;
-        if(!cnt.has_value()){
-            cnt.emplace(1);
-        }
-        return cnt.value()++;
+    int find_free_socket_key(){
+        return min_free_socket_key++;
     }
     static SocketManager* gman;
     std::map<int, int> open_sockets;
+    int min_free_socket_key;
 };
 
 void releaseResources(int signum) {
@@ -135,14 +132,12 @@ SocketManager* SocketManager::gman = nullptr;
 
 int main(int argc, char** argv){
     static const std::vector<std::string> WORKER_SERVER_IPS = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
-    // static constexpr auto WORKER_NET_IFACE = 
-    // static constexpr auto CLIENT_IFACE = "10.0.0.1";
     static constexpr int LISTEN_PORT = 80;
 
     signal(SIGTERM, releaseResources);    
     try{
         //Choose load balancer algorithm implementation/policy:
-        LBCore& lb = *dispatchLBCore(argc, argv);;
+        LBCore& lb = *dispatchLBCore(argc, argv);
         
         //The socket manager remembers all of the open sessions. It is a singleton.
         SocketManager& sm = SocketManager::get();
