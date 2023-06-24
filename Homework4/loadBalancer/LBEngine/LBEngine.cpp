@@ -155,7 +155,7 @@ SocketManager* SocketManager::gman = nullptr;
 
 std::string getPeerAddress(int socknum) {
     struct sockaddr_in address{};
-    socklen_t addr_length = sizeof(socknum);
+    socklen_t addr_length = sizeof(address);
 
     // Get the client address information
     if (getpeername(socknum, (struct sockaddr*)&address, &addr_length) == -1) {
@@ -178,7 +178,7 @@ int main(int argc, char** argv){
     signal(SIGTERM, releaseResources);   
     try{
         //Choose load balancer algorithm implementation/policy:
-        LBCore& lb = *dispatchLBCore(argc, argv);
+        std::shared_ptr<LBCore> lb = dispatchLBCore(argc, argv);
         
         //The socket manager remembers all of the open sessions. It is a singleton.
         SocketManager& sm = SocketManager::get();
@@ -243,14 +243,14 @@ int main(int argc, char** argv){
                     std::cout << "Client disconnected" << std::endl;
                 } else {
                     printf("Recived '%s' from client.\n", client_req.c_str());
-                    int handling_server_idx = lb.handleRequest(client_req.c_str());
+                    int handling_server_idx = lb->handleRequest(client_req.c_str());
                     workers[handling_server_idx].sendRequest(client_req, client_session_key);
                 }
             }
             //Forward any responses sent by the worker servers:
             for(int worker_server_idx = 0; worker_server_idx < workers.size(); ++worker_server_idx) {
                 if(workers.at(worker_server_idx).handleResponse()){
-                    lb.notify(worker_server_idx);
+                    lb->notify(worker_server_idx);
                 }
             }
         }

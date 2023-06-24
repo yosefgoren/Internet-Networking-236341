@@ -6,7 +6,7 @@ CLANG=clang++ $(CLANG_FLAGS)
 
 all: load_balancer emulator
 
-load_balancer: LBEngine/LBEngine.cpp LBCore/LBCore.hpp Common/Fifo.hpp
+load_balancer: LBEngine/LBEngine.cpp LBCore/LBCore.hpp Common/Fifo.hpp Common/Req?uest.hpp
 	$(GPP) LBEngine/LBEngine.cpp -o $@
 
 emulator: Emulator/Emulator.cpp LBCore/LBCore.hpp Common/Fifo.hpp

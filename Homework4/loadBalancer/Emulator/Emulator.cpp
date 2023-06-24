@@ -37,6 +37,7 @@ public:
         return m;
     }
     
+    //TODO: WHERE IS LB NOTIFY?
     Event createClientRequestEvent(int client_idx){
         return [=](){
             auto& client_requests_list = client_requests_lists[client_idx];
@@ -44,7 +45,6 @@ public:
             client_requests_list.pop_back();
             int server_idx = lb->handleRequest(next_client_request.to_string().c_str());
             int elapsed_time = worker_infos[server_idx]->getCompletionTime(next_client_request);
-            
             workers_times_to_finish[server_idx] += elapsed_time;
             event_map.emplace(workers_times_to_finish[server_idx], createServerResponseEvent(client_idx, server_idx, elapsed_time));
         };
@@ -59,6 +59,7 @@ public:
     }
 
     std::map<unsigned, Event> event_map;
+
     std::shared_ptr<LBCore> lb;
     std::vector<std::shared_ptr<WorkerServerInfo>> worker_infos;
     std::vector<std::vector<Request>> client_requests_lists;
