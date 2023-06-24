@@ -72,6 +72,7 @@ void releaseResources(int signum) {
 class WorkerServerManager{
 public:
     WorkerServerManager(const std::string& ipaddr, int worker_listen_port){
+        printf("Attempting to connect to worker server at: %s:%d\n", ipaddr.c_str(), worker_listen_port);
         // Create the socket
         worker_server_socknum = socket(AF_INET, SOCK_STREAM, 0);
         if (worker_server_socknum == -1) {
@@ -84,10 +85,31 @@ public:
         serverAddress.sin_port = htons(worker_listen_port);
         serverAddress.sin_addr.s_addr = inet_addr(ipaddr.c_str());
 
+        // Set the timeout value (in milliseconds)
+        int timeout_millisec = 2000; // Example timeout value of 5 seconds
+        struct timeval timeout{};
+        timeout.tv_sec = timeout_millisec / 1000;
+        timeout.tv_usec = (timeout_millisec % 1000) * 1000;
+
+        // Set the socket option for receive timeout
+        if (setsockopt(worker_server_socknum, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) < 0) {
+            throw std::runtime_error("Failed to set receive timeout");
+        }
+        // Set the socket option for send timeout
+        if (setsockopt(worker_server_socknum, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout)) < 0) {
+            throw std::runtime_error("Failed to set send timeout");
+        }
+
         // Connect to the server
         if (connect(worker_server_socknum, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) == -1) {
-            throw std::runtime_error("Failed to connect to server");
+            // Check if the error indicates a timeout
+            if (errno == EINPROGRESS || errno == EWOULDBLOCK) {
+                throw std::runtime_error("Connection timeout");
+            } else {
+                throw std::runtime_error("Failed to connect to server");
+            }
         }
+        printf("Succesfully connected to worker server\n");
         SocketManager::get().insertSocket(worker_server_socknum);
     }
     WorkerServerManager() = delete;
@@ -211,7 +233,7 @@ int main(int argc, char** argv){
             }
         }
     } catch(std::runtime_error& e){
-        printf("LBEngine stopped due to unexpected error: '%s'\n", e.what());
+        printf("LBEngine error: '%s'\n", e.what());
         releaseResources(1);
     }
     return 0;
