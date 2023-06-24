@@ -21,6 +21,8 @@ public:
             case Request::Type::Music: return 2;
             case Request::Type::Video: return 1;
             case Request::Type::Photo: return 1;
+            default:
+                throw std::runtime_error("got unexpected request type");
         }
     }
 };
@@ -33,6 +35,8 @@ public:
             case Request::Type::Music: return 1;
             case Request::Type::Video: return 3;
             case Request::Type::Photo: return 2;
+            default:
+                throw std::runtime_error("got unexpected request type");
         }
     }
 };

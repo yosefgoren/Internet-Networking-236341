@@ -3,10 +3,10 @@
 #include "../Common/Request.hpp"
 #include "../Common/WorkerServerInfo.hpp"
 
+#define NUM_WORKER_SERVERS 3
+
 class LBCore{
 public:
-    static const unsigned NUM_WORKER_SERVERS = 3;
-
     virtual ~LBCore(){}
     virtual int handleRequest(const char* req) = 0;
     /**
@@ -55,7 +55,7 @@ public:
     virtual void notify(unsigned server_idx) override{
         unsigned time_passed = times_to_finish[server_idx];
         for(unsigned& time: times_to_finish){
-            time = std::max(0u, time-time_passed);
+            time = std::max(0, int(time)-int(time_passed));
         }
     }
 private:

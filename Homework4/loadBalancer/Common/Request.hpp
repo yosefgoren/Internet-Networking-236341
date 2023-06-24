@@ -19,7 +19,7 @@ struct Request{
     };
 
     std::string to_string() const{
-        return std::string("")+type_to_char(type)+std::to_string(duration_secs);
+        return std::string("")+type_to_char.at(type)+std::to_string(duration_secs);
     }
 
     Type type;
@@ -47,7 +47,7 @@ struct Request{
     }
 private:
     static const std::map<char, Type> char_to_type;
-    static const std::map<char, Type> type_to_char;
+    static const std::map<Request::Type, char> type_to_char;
 };
 
 const std::map<char, Request::Type> Request::char_to_type = {
@@ -55,7 +55,7 @@ const std::map<char, Request::Type> Request::char_to_type = {
     {'V',Video},
     {'P',Photo},
 };
-const std::map<char, Request::Type> Request::type_to_char = {
+const std::map<Request::Type, char> Request::type_to_char = {
     {Music, 'M'},
     {Video, 'V'},
     {Photo, 'P'},
