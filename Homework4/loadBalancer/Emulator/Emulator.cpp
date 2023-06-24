@@ -37,7 +37,6 @@ public:
         return m;
     }
     
-    //TODO: WHERE IS LB NOTIFY?
     Event createClientRequestEvent(int client_idx){
         return [=](){
             auto& client_requests_list = client_requests_lists[client_idx];
@@ -54,6 +53,7 @@ public:
         return [=](){
             workers_times_to_finish[server_idx] -= time_step;
             worker_total_times[server_idx] += time_step;
+            lb->notify(server_idx);
             event_map.emplace(0, createClientRequestEvent(client_idx));
         };
     }

@@ -21,7 +21,9 @@ struct Request{
     };
 
     std::string to_string() const{
-        return std::string("")+type_to_char.at(type)+std::to_string(duration_secs);
+        auto res = std::string("")+type_to_char.at(type)+std::to_string(duration_secs);
+        printf("Request::to_string returning %s to {%c, %lu}\n", res.c_str(), type_to_char.at(type), duration_secs);
+        return res;
     }
 
     Type type;
@@ -41,7 +43,9 @@ struct Request{
             unsigned line_requests = line.size()/2;
             for(unsigned i = 0; i < line_requests; ++i){
                 std::string src = line.substr(i*2, 2);
-                res.push_back(Request(src));
+                Request new_req = Request(src);
+                res.push_back(new_req);
+                printf("Reqeust parser adding request: %s and got type: %c, duration: %lu\n", src.c_str(), type_to_char.at(new_req.type), new_req.duration_secs);
             }
         }
         file.close();
