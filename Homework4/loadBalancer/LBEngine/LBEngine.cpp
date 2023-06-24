@@ -65,6 +65,7 @@ private:
 };
 
 void releaseResources(int signum) {
+    printf("Deallocating sockets and exiting...\n");
     SocketManager::deallocate();
     exit(signum);
 }
@@ -104,7 +105,7 @@ public:
         if (connect(worker_server_socknum, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) == -1) {
             // Check if the error indicates a timeout
             if (errno == EINPROGRESS || errno == EWOULDBLOCK) {
-                throw std::runtime_error("Connection timeout");
+                throw std::runtime_error("Could not connect to worker server due to timeout");
             } else {
                 throw std::runtime_error("Failed to connect to server");
             }
@@ -136,7 +137,7 @@ public:
             throw std::runtime_error("worker server has disconnected");
         }
         std::string resp = std::string(buffer, bytesRead);
-        printf("[Info] Response from worker server: '%s'\n", resp.c_str());
+        printf("Response from worker server: '%s'\n", resp.c_str());
         
         int client_session_key = request_fifo.pop();
         int client_session_socknum = SocketManager::get().getSocknum(client_session_key);
@@ -152,11 +153,28 @@ private:
 
 SocketManager* SocketManager::gman = nullptr;
 
+std::string getPeerAddress(int socknum) {
+    struct sockaddr_in address{};
+    socklen_t addr_length = sizeof(socknum);
+
+    // Get the client address information
+    if (getpeername(socknum, (struct sockaddr*)&address, &addr_length) == -1) {
+        throw std::runtime_error("Failed to get peer address");
+    }
+
+    char peerIP[INET_ADDRSTRLEN];
+    if (inet_ntop(AF_INET, &(address.sin_addr), peerIP, INET_ADDRSTRLEN) == nullptr) {
+        throw std::runtime_error("Failed to convert peer IP");
+    }
+
+    return std::string(peerIP);
+}
+
 int main(int argc, char** argv){
     static const std::vector<std::string> WORKER_SERVER_IPS = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
     static const int LISTEN_PORT = 80;
 
-    signal(SIGTERM, releaseResources);    
+    signal(SIGTERM, releaseResources);   
     try{
         //Choose load balancer algorithm implementation/policy:
         LBCore& lb = *dispatchLBCore(argc, argv);
@@ -169,6 +187,7 @@ int main(int argc, char** argv){
         for(const std::string& ipaddr : WORKER_SERVER_IPS){
             workers.push_back(WorkerServerManager(ipaddr, LISTEN_PORT));
         }
+        printf("finished connecting to all worker servers\n");
 
         //Open socket for listening to clients:
         int req_listen_socknum = socket(AF_INET, SOCK_STREAM, 0);//TCP
@@ -197,6 +216,8 @@ int main(int argc, char** argv){
             throw std::runtime_error("Failed to set socket to non-blocking mode");
         }   
 
+        printf("Finished creating request listenting socket");
+
         while(true){
             // Listen for incoming connections
             if (listen(req_listen_socknum, 100) < 0) {
@@ -208,7 +229,7 @@ int main(int argc, char** argv){
             int client_session_key = sm.insertSocket(client_req_socknum);
 
             if(client_req_socknum >= 0) {
-                printf("Client connected\n");
+                printf("New connection to client at: '%s'\n", getPeerAddress(client_req_socknum).c_str());
                 
                 // Get message from client and print it:
                 char buffer[1024];
@@ -220,7 +241,7 @@ int main(int argc, char** argv){
                 } else if (bytesRead == 0) {
                     std::cout << "Client disconnected" << std::endl;
                 } else {
-                    printf("[Info] Recived: '%s'\n", client_req.c_str());
+                    printf("Recived '%s' from client.\n", client_req.c_str());
                     int handling_server_idx = lb.handleRequest(client_req.c_str());
                     workers[handling_server_idx].sendRequest(client_req, client_session_key);
                 }
@@ -234,7 +255,9 @@ int main(int argc, char** argv){
         }
     } catch(std::runtime_error& e){
         printf("LBEngine error: '%s'\n", e.what());
-        releaseResources(1);
+    } catch(...){
+        printf("LBEngine encountered an unexpected exception\n");
     }
+    releaseResources(1);
     return 0;
 }
