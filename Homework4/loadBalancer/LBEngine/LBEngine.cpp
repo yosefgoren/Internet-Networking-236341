@@ -172,6 +172,7 @@ std::string getPeerAddress(int socknum) {
 
 int main(int argc, char** argv){
     static const std::vector<std::string> WORKER_SERVER_IPS = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
+    static const auto CLIENT_LISTEN_IFACE = "10.0.0.1";
     static const int LISTEN_PORT = 80;
 
     signal(SIGTERM, releaseResources);   
@@ -187,7 +188,7 @@ int main(int argc, char** argv){
         for(const std::string& ipaddr : WORKER_SERVER_IPS){
             workers.push_back(WorkerServerManager(ipaddr, LISTEN_PORT));
         }
-        printf("finished connecting to all worker servers\n");
+        printf("Finished connecting to all worker servers\n");
 
         //Open socket for listening to clients:
         int req_listen_socknum = socket(AF_INET, SOCK_STREAM, 0);//TCP
@@ -198,8 +199,8 @@ int main(int argc, char** argv){
 
         // Prepare the server address
         sockaddr_in serverAddress{};
-        serverAddress.sin_family = AF_INET;
-        serverAddress.sin_addr.s_addr = INADDR_ANY;
+        serverAddress.sin_family = AF_INET;//IPv4
+        serverAddress.sin_addr.s_addr = inet_addr(CLIENT_LISTEN_IFACE);
         serverAddress.sin_port = htons(LISTEN_PORT);
 
         // Bind the socket to the specified IP address and port
@@ -216,7 +217,7 @@ int main(int argc, char** argv){
             throw std::runtime_error("Failed to set socket to non-blocking mode");
         }   
 
-        printf("Finished creating request listenting socket");
+        printf("Finished creating request listenting socket\n");
 
         while(true){
             // Listen for incoming connections
