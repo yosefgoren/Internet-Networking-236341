@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #sudo python exampleLB.pyc
-# sudo ./load_balancer greedy
+sudo ./load_balancer greedy
 # sudo ./load_balancer rr
-sudo ./load_balancer first
+# sudo ./load_balancer first
 echo "load_balancer exited with code "$?
