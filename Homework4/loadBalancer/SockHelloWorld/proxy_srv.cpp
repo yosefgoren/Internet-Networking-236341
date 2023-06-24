@@ -84,7 +84,7 @@ private:
     std::vector<int> queue;
 };
 
-static int echo_srv_socknum;//TODO: maybe need to seperate read from write?
+static int echo_srv_socknum;
 
 // Also signal handler function
 //TODO: set signahandler to this:

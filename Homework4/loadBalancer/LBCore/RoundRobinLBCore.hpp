@@ -3,14 +3,16 @@
 
 class RoundRobinLBCore : public LBCore{
 public:
-    LBCore()
-        idx(0){}
-    virtual ~LBCore(){}
+    RoundRobinLBCore()
+        :idx(0){}
+    virtual ~RoundRobinLBCore(){}
 
-    ServerDescriptor handleRequest(const RequestDetails& req){
+    virtual int handleRequest(const char* req) override{
         idx = (idx+1)%NUM_SERVERS;
         return idx;
     }
+
+    virtual void notify(int server_idx) override{}
 private:
     int idx;
 };
