@@ -9,7 +9,7 @@ struct Request{
         if(src.size() != 2){
             throw std::runtime_error("Request c'tor expected source string to be exactly 2 characters");
         }
-        type = type_chars.at(src[0]);
+        type = char_to_type.at(src[0]);
         duration_secs = src[1]-'0';
     }
     enum Type{
@@ -17,6 +17,10 @@ struct Request{
         Video,
         Photo
     };
+
+    std::string to_string() const{
+        return std::string("")+type_to_char(type)+std::to_string(duration_secs);
+    }
 
     Type type;
     size_t duration_secs;
@@ -42,11 +46,17 @@ struct Request{
         return res;
     }
 private:
-    static const std::map<char, Type> type_chars;
+    static const std::map<char, Type> char_to_type;
+    static const std::map<char, Type> type_to_char;
 };
 
-const std::map<char, Request::Type> Request::type_chars = {
+const std::map<char, Request::Type> Request::char_to_type = {
     {'M',Music},
     {'V',Video},
     {'P',Photo},
+};
+const std::map<char, Request::Type> Request::type_to_char = {
+    {Music, 'M'},
+    {Video, 'V'},
+    {Photo, 'P'},
 };

@@ -132,7 +132,7 @@ SocketManager* SocketManager::gman = nullptr;
 
 int main(int argc, char** argv){
     static const std::vector<std::string> WORKER_SERVER_IPS = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
-    static constexpr int LISTEN_PORT = 80;
+    static const int LISTEN_PORT = 80;
 
     signal(SIGTERM, releaseResources);    
     try{

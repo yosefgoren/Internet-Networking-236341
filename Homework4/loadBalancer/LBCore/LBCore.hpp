@@ -5,7 +5,7 @@
 
 class LBCore{
 public:
-    static constexpr unsigned NUM_WORKER_SERVERS = 3;
+    static const unsigned NUM_WORKER_SERVERS = 3;
 
     virtual ~LBCore(){}
     virtual int handleRequest(const char* req) = 0;

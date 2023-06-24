@@ -7,6 +7,10 @@ class WorkerServerInfo{
 public:
     virtual ~WorkerServerInfo(){};
     virtual unsigned getDurationModifer(Request::Type type) = 0;
+
+    virtual unsigned getCompletionTime(const Request& req){
+        return req.duration_secs*getDurationModifer(req.type);
+    }
 };
 
 class VideoServerInfo : public WorkerServerInfo{
