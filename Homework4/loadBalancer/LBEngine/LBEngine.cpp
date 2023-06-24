@@ -10,7 +10,7 @@
 #include <optional>
 #include <vector>
 
-#include "../LBCore/RoundRobinLBCore.hpp"
+#include "../LBCore/LBCore.hpp"
 #include "../Common/Fifo.hpp"
 
 class SocketManager{
@@ -141,10 +141,10 @@ int main(int argc, char** argv){
 
     signal(SIGTERM, releaseResources);    
     try{
-        //TODO: implement dynamic LBCore subclass dispatch based on argv?
-
         //Choose load balancer algorithm implementation/policy:
-        LBCore& lb = *std::shared_ptr<LBCore>(new RoundRobinLBCore());
+        LBCore& lb = *dispatchLBCore(argc, argv);;
+        
+        //The socket manager remembers all of the open sessions. It is a singleton.
         SocketManager& sm = SocketManager::get();
 
         //Open connections with servers:
