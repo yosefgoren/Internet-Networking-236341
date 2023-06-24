@@ -9,7 +9,7 @@ public:
     typedef std::function<void()> Event;
     
     Emulator()
-            :lb(*dispatchLBCore(argc, argv)){
+            :lb(dispatchLBCore(argc, argv)){
         worker_infos = get_server_infos();
         for(unsigned client_idx = NUM_CLIENTS-1; client_idx >= 0; --client_idx){
                 std::string client_requests_filename = "h"+std::to_string(client_idx)+".in";
@@ -34,12 +34,13 @@ public:
         return std::max(worker_total_times);
     }
     
+    //TODO: WHERE IS LB NOTIFY?
     Event createClientRequestEvent(int client_idx){
         return [=](){
             auto& client_requests_list = client_requests_lists[client_idx];
             Request next_client_request = client_requests_list.back();
             client_requests_list.pop_back();
-            int server_idx = lb.handleRequest(next_client_request.to_string());
+            int server_idx = lb->handleRequest(next_client_request.to_string());
             int elapsed_time = worker_infos[server_idx].getCompletionTime(next_client_request);
             
             workers_times_to_finish[server_idx] += elapsed_time;
@@ -59,7 +60,7 @@ public:
 
     std::map<unsigned, Event> event_map;
 
-    LBCore& lb;
+    std::shared_ptr<LBCore> lb;
     std::vector<std::shared_ptr<WorkerServerInfo>> worker_infos;
     std::vector<std::vector<Request>> client_requests_lists;
     std::vector<unsigned> workers_times_to_finish;

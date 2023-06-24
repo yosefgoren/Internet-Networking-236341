@@ -9,8 +9,10 @@ struct Request{
         if(src.size() != 2){
             throw std::runtime_error("Request c'tor expected source string to be exactly 2 characters");
         }
+        printf("Creating request from %s\n", src.c_str());
         type = char_to_type.at(src[0]);
         duration_secs = src[1]-'0';
+        printf("Finished creating request\n");
     }
     enum Type{
         Music,

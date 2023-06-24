@@ -4,7 +4,7 @@ CLANG_FLAGS=$(COMMON_FLAGS) -std=c++17 -ferror-limit=1
 GPP=g++ $(GPP_FLAGS)
 CLANG=clang++ $(CLANG_FLAGS)
 
-load_balancer: LBEngine/LBEngine.cpp LBCore/LBCore.hpp Common/Fifo.hpp
+load_balancer: LBEngine/LBEngine.cpp LBCore/LBCore.hpp Common/Fifo.hpp Common/Request.hpp
 	$(GPP) LBEngine/LBEngine.cpp -o $@
 
 clean:

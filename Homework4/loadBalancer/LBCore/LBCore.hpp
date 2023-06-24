@@ -24,11 +24,15 @@ class GreedyLBCore : public LBCore{
 public:
     virtual ~GreedyLBCore() override = default;
     GreedyLBCore(){
-        times_to_finish = std::vector<unsigned>(0, NUM_WORKER_SERVERS);
+        for(int i = 0; i < NUM_WORKER_SERVERS; ++i){
+            times_to_finish.push_back(0);
+        }
+        // times_to_finish = std::vector<unsigned>(0, NUM_WORKER_SERVERS);
         worker_infos = get_server_infos();
     }
 
     virtual int handleRequest(const char* req_str) override{
+        printf("GreedyLBCore starting to handle request: %s\n", req_str);
         Request req(req_str);
 
         unsigned min_finish_time = 0xffffffff;//max int
@@ -45,6 +49,7 @@ public:
         }
         //Update the estimated finish time of the chosen server:
         times_to_finish[min_server_idx] = min_finish_time;
+        printf("GreedyLBCore Finshed handling requst. Returning server index: %d\n", min_server_idx);
         return min_server_idx;
     }
 
@@ -80,12 +85,26 @@ private:
     int idx;
 };
 
+class FirstWorkerLBCore : public LBCore{
+public:
+    virtual ~FirstWorkerLBCore() override = default;
+    FirstWorkerLBCore(){}
+
+    virtual int handleRequest(const char* req) override{
+        return 0;
+    }
+
+    virtual void notify(unsigned server_idx) override{}
+};
+
 
 std::shared_ptr<LBCore> dispatchLBCore(const std::string& desciption){
     if(desciption == "rr")
         return std::shared_ptr<LBCore>(new RoundRobinLBCore());
     else if(desciption == "greedy")
         return std::shared_ptr<LBCore>(new GreedyLBCore());
+    else if(desciption == "cxx11" || desciption == "first")
+        return std::shared_ptr<LBCore>(new FirstWorkerLBCore());
     else
         throw std::runtime_error("LBCore dispatch function got unexpected description");
 }
