@@ -5,12 +5,17 @@ USER=$(shell cat user.buildinfo)
 IDS=$(ID1)_$(ID2)
 IDS_MINUS=$(ID1)-$(ID2)
 
-Submission/$(IDS_MINUS).zip: Submission/$(IDS).pdf
-	cd Submission && zip $(IDS_MINUS).zip $(IDS).pdf
+Submission/$(IDS_MINUS).zip: Submission/$(IDS).pdf Submission/id.txt
+	cp -r loadBalancer Submission/loadBalancer
+	cd Submission && zip -r $(IDS_MINUS).zip $(IDS).pdf id.txt loadBalancer
 	cp $@ /mnt/c/Users/$(USER)/Desktop/
 
 Submission/$(IDS).pdf: Report/main.pdf
 	cp $^ $@
+
+Submission/id.txt:
+	cd Submission && echo $(ID1) "Yosef Goren" >> id.txt
+	cd Submission && echo $(ID2) "Ori Evron" >> id.txt
 
 clean:
 	rm -rf Submission/$(IDS).pdf Submission/$(IDS_MINUS).zip
