@@ -68,7 +68,9 @@ this happans because as seen in the graph, the number of flows that passes it is
 so, all the passing flows have a valeu of 1/6.
 In the second round, all the flows that passes through the lin between 3 and 4 are removed,
 and the new bottleneck is the link between nodes 5 and 6, the flow  between 5 to 6 and 4 to 6 each get 1/4.
-In the thierd round, the only flow left is the flow beween 4 to 5, it has 10 - 5/6 - 1/4 = 8 + 11/12.
+In the thierd round, the only flow left is the flow beween 4 to 5, it has 10 - 5/6 - 1/4 = 8 + 11/12.\\
+The details can also seen in the attached photo:\\
+\includegraphics[width=\textwidth]{i2.png}
 
 \subsection{Counter-Clockwise Flows}
 In the first round, we see that the link with the minimal
@@ -85,6 +87,8 @@ To sum up the final bandwidths recived by each flow:
     \item $1\rightarrow 6$: 9 units of bandwidth.
     \item All ofther flows: $\frac{1}{8}$ units of bandwidth.
 \end{itemize}
+The details can also seen in the attached photo:\\
+\includegraphics[width=\textwidth]{i1.png}
 
 
 \section{TCP Reno Congestion Control}
@@ -128,6 +132,43 @@ and after transmission round the total is 126
 - so the 100'th segment must have been sent at the 7'th round.
 
 \section{TCP Congestion Control}
-\section{TCP Cubic Congestion Control}
+\subsection{}
+According to Tutorial 8, the only way for TCP Reno and TCP New Reno to detect congestion is by creating it.
+This means increasing the congestion window (cwnd) and waiting for a packet loss.
+The main differences between TCP Reno and TCP New Reno are
+New Reno's use of Selective Acknowledgment (SACK) and the modified fast recovery.
+
+\subsection{}
+TCP Vegas detects congestion by estimating the optimal throughput.
+It calculates the throughput and compares it to the current throughput minus alpha.
+If the current throughput is greater, TCP Vegas assumes there
+is congestion and lowers the packet sending speed.
+
+\subsection{}
+Contrary to TCP Reno, TCP Vegas does not divide the congestion window (cwnd) in half when congestion is detected.
+Instead, TCP Vegas lowers the cwnd size in a linear manner. This approach minimizes the impact on throughput compared to TCP Reno,
+as it avoids the "saw" shape in the cwnd as a function of time graph.
+
+\subsection{}
+TCP Vegas can be outperformed by TCP Reno. This is because, during the initial stages,
+TCP Vegas lacks a slow start phase. As a result, the increase in congestion window (cwnd) of TCP Vegas is linear,
+whereas TCP Reno exhibits an exponential increase.
+
+\subsection{}
+TCP Compound maintains two types of windows: the original congestion window (cwnd) and the delay window (dwnd).
+It uses both dwnd and cwnd to calculate the sending window. The dwnd represents the delay component of CTCP,
+and by utilizing dwnd, CTCP can achieve better scalability in high-speed and long-delay networks.
+
+\subsection{}
+The protocol can lower the congestion window (cwnd) in a linear manner instead of dividing it in half,
+resulting in a better throughput.
+
+\subsection{}
+The protocol has additional variables, such as the delay variable,
+which it can use to calculate the estimated throughput more accurately compared to TCP Vegas.
+
+
+
+% \section{TCP Cubic Congestion Control}
 
 \end{document}
